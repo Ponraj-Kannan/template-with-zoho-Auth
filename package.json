@@ -1,0 +1,56 @@
+{
+  "name": "faceprep-java-slides",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "FACEPrep Interactive Java Training Slides",
+  "engines": {
+    "node": ">=22.0"
+  },
+  "scripts": {
+    "dev": "node scripts/slidev-deck.mjs dev",
+    "dev:01": "node scripts/slidev-deck.mjs dev src/root.md",
+    "build": "node scripts/slidev-deck.mjs build",
+    "build:01": "node scripts/slidev-deck.mjs build src/root.md",
+    "new:deck": "node scripts/create-slide-deck.mjs",
+    "new:session": "node templates/generators/new-session.js",
+    "template:generate": "node templates/generators/new-session.js",
+    "template:validate": "node templates/generators/template-utils.js validate",
+    "template:list": "node -e \"const fs=require('fs'); console.log('Available sessions:'); fs.readdirSync('src').filter(f=>f.match(/^\\d{2}-.+\\.md$/)).forEach(f=>console.log('  '+f))\"",
+    "template:help": "node -e \"console.log('Template System Commands:'); console.log('  npm run new:session          - Create new session from template'); console.log('  npm run template:generate    - Alias for new:session'); console.log('  npm run template:validate    - Validate template files'); console.log('  npm run template:list        - List available sessions'); console.log('  npm run scripts:update       - Update package.json scripts'); console.log('  npm run workflow:setup       - Complete workflow setup'); console.log('  npm run workflow:dev         - Start development workflow');\"",
+    "dev:watch": "node scripts/slidev-deck.mjs dev --open --host",
+    "dev:reload": "node scripts/slidev-deck.mjs dev --open --host --port 3333",
+    "dev:network": "node scripts/slidev-deck.mjs dev --open --host=0.0.0.0 --port 3333",
+    "dev:all": "npm run template:list && echo 'Use dev:<session-number> to start a specific session'",
+    "scripts:update": "node scripts/update-session-scripts.mjs",
+    "scripts:sync": "npm run scripts:update",
+    "scripts:auto": "npm run scripts:update && echo 'Session scripts updated automatically'",
+    "workflow:setup": "node scripts/workflow-integration.mjs setup",
+    "workflow:dev": "node scripts/workflow-integration.mjs dev",
+    "workflow:validate": "node scripts/workflow-integration.mjs validate",
+    "workflow:status": "node scripts/workflow-integration.mjs status",
+    "workflow:new": "npm run new:session && npm run scripts:update && echo 'New session created and scripts updated'",
+    "workflow:help": "node -e \"console.log('Template System Commands:'); console.log('  npm run new:session          - Create new session from template'); console.log('  npm run template:generate    - Alias for new:session'); console.log('  npm run template:validate    - Validate template files'); console.log('  npm run template:list        - List available sessions'); console.log('  npm run scripts:update       - Update package.json scripts'); console.log('  npm run workflow:setup       - Complete workflow setup'); console.log('  npm run workflow:dev         - Start development workflow'); console.log(''); console.log('Development Commands:'); console.log('  npm run dev:<XX>             - Start development server for session XX'); console.log('  npm run build:<XX>           - Build session XX for production'); console.log('  npm run dev:reload           - Start with live reload on port 3333'); console.log('  npm run dev:network          - Start with network access'); console.log('  npm run workflow:new         - Create new session and update scripts'); console.log('  npm run workflow:setup       - Complete workflow setup'); console.log('  npm run workflow:validate    - Validate development environment'); console.log('  npm run workflow:status      - Show workflow status');\"",
+    "preview": "npx serve dist",
+    "preview:local": "npx serve dist --host localhost --port 3000",
+    "dev:99": "node scripts/slidev-deck.mjs dev src/99-template-check.md",
+    "build:99": "node scripts/slidev-deck.mjs build src/99-template-check.md",
+    "dev:03": "node scripts/slidev-deck.mjs dev src/03-operators.md",
+    "build:03": "node scripts/slidev-deck.mjs build src/03-operators.md",
+    "dev:02": "node scripts/slidev-deck.mjs dev src/02-java-fundamentals.md",
+    "build:02": "node scripts/slidev-deck.mjs build src/02-java-fundamentals.md"
+  },
+  "dependencies": {
+    "@slidev/cli": "latest",
+    "@slidev/theme-default": "latest",
+    "firebase": "^12.13.0",
+    "monaco-editor": "^0.46.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.102",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1"
+  }
+}

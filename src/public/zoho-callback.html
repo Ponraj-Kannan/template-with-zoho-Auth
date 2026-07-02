@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoho Sign-In — Authenticating...</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #1e293b;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 2.5rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      max-width: 360px;
+      width: 90%;
+      box-shadow: 0 8px 32px -8px rgba(15,23,42,0.1);
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(239, 80, 80, 0.15);
+      border-left-color: #ef5050;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #0f172a;
+      text-align: center;
+    }
+
+    p {
+      font-size: 0.82rem;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .error-card {
+      border-color: #fca5a5;
+      background: #fff5f5;
+    }
+
+    .error-icon {
+      font-size: 2.5rem;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="spinner" id="spinner"></div>
+    <h2 id="title">Completing sign-in…</h2>
+    <p id="subtitle">Verifying your Zoho account. This window will close automatically.</p>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search)
+      const code  = params.get('code')
+      const error = params.get('error')
+      const state = params.get('state')
+
+      function showError(msg) {
+        const card = document.getElementById('card')
+        card.classList.add('error-card')
+        document.getElementById('spinner').style.display = 'none'
+        document.getElementById('title').textContent = 'Sign-in failed'
+        document.getElementById('subtitle').textContent = msg
+      }
+
+      // ── Error from Zoho ─────────────────────────────────────────────────
+      if (error) {
+        const description = params.get('error_description') || error
+        showError(description)
+        if (window.opener) {
+          window.opener.postMessage(
+            { type: 'ZOHO_AUTH_ERROR', error: description },
+            window.location.origin
+          )
+        }
+        return
+      }
+
+      // ── No code returned ─────────────────────────────────────────────────
+      if (!code) {
+        showError('No authorization code received from Zoho.')
+        if (window.opener) {
+          window.opener.postMessage(
+            { type: 'ZOHO_AUTH_ERROR', error: 'No authorization code received.' },
+            window.location.origin
+          )
+        }
+        return
+      }
+
+      // ── Send code + state to parent window ───────────────────────────────
+      if (window.opener) {
+        window.opener.postMessage(
+          { type: 'ZOHO_AUTH_CODE', code, state },
+          window.location.origin
+        )
+        // Small delay so user sees the spinner before close
+        setTimeout(() => window.close(), 800)
+      } else {
+        // Opened as top-level redirect (not popup) — store in sessionStorage
+        // and redirect back to the main app
+        sessionStorage.setItem('zoho_auth_code', code)
+        sessionStorage.setItem('zoho_auth_state', state || '')
+        const returnTo = sessionStorage.getItem('zoho_return_to') || '/'
+        window.location.replace(returnTo)
+      }
+    })()
+  </script>
+</body>
+</html>
